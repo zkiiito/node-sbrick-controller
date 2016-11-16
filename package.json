@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Control the SBrick from nodejs",
   "main": "index.js",
-  "repository" :  {
+  "repository": {
     "type": "git",
     "url": "https://github.com/zkiiito/node-sbrick-controller.git"
   },
@@ -25,17 +25,13 @@
     "async": "^2.1.1",
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
-    "noble": "^1.6.0",
-    "node-persist": "^2.0.7",
-    "promise-queue": "^2.2.3",
     "purecss": "^0.6.0",
     "request": "^2.78.0",
-    "socket.io": "^1.4.8",
-    "winston": "^2.2.0"
+    "sbrick-protocol": "^1.0.0",
+    "socket.io": "^1.4.8"
   },
   "devDependencies": {
     "keycode": "^2.1.7",
-    "mocha": "^3.0.2",
     "grunt": "1.0.*",
     "grunt-contrib-concat": "^1.0.0",
     "grunt-contrib-uglify": "^2.0.0",

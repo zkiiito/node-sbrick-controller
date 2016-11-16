@@ -1,4 +1,4 @@
-const SBrick = require('./SBrick');
+const SBrick = require('sbrick-protocol');
 const express = require('express');
 const app = express();
 const server = require('http').Server(app);

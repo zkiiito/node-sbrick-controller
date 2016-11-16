@@ -19,21 +19,7 @@ Working from the web UI:
 * connect/disconnect
 * channel control (drive with keyboard keys)
 * temperature & voltage real time chart
+* display video stream
 
 Still under development:
 * overall security: to put it on an raspberry PI, and control your creation from anywhere, it needs some :)
-* some video streaming solution - to see where is your creation
-* many SBrick commands implemented, but not available on the UI:
-  * watchdog
-  * thermal limit
-  * release on reset
-  * uptime counter
-  * power cycle counter
-* commands not implemented (yet):
-  * authentication (in progress)
-  * programming
-  * events
-  * connection parameters
-  * PWM counter
-  * quick drive
-* I'm also thinking about separating the SBrick protocol implementation and the web UI.
