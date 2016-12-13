@@ -10,6 +10,7 @@ var Socket = {
         this.socket.on('SBrick.voltAndTemp', this.voltAndTemp);
         this.socket.on('connect', this.scan.bind(this));
         this.socket.on('disconnect', this.disconnectedFromServer);
+        this.socket.on('log', this.log);
     },
 
     scan: function () {
@@ -50,5 +51,9 @@ var Socket = {
 
     disconnectedFromServer: function () {
         app.disconnectedFromServer();
+    },
+
+    log: function (level, message) {
+        console.log(level, message);
     }
 };

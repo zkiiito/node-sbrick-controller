@@ -36,12 +36,12 @@ module.exports = {
                         'minimum': -255,
                     },
                     'keyInc': {
-                        'type': 'integer',
+                        'type': ['integer', 'null'],
                         'maximum': 255,
                         'minimum': 1,
                     },
                     'keyDec': {
-                        'type': 'integer',
+                        'type': ['integer', 'null'],
                         'maximum': 255,
                         'minimum': 1,
                     }

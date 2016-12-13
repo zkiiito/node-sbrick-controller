@@ -4,13 +4,23 @@ const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const bodyParser = require('body-parser');
+const session = require('express-session');
 const storage = require('node-persist');
 const async = require('async');
 const Ajv = require('ajv');
 const request = require('request');
+const winston = require('winston');
+const socketLogger = require('./SocketLogger');
 const schema = require('./SBrickSchema');
 
 const ajv = new Ajv();
+
+const sessionMiddleware = session({
+    secret: 'node-sbrick-controller',
+    name: 'SBrickController',
+    saveUninitialized: true,
+    resave: false
+});
 
 storage.initSync({
     dir: __dirname + '/data'
@@ -18,8 +28,27 @@ storage.initSync({
 
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
+app.use(sessionMiddleware);
+
+io.use(function(socket, next) {
+    sessionMiddleware(socket.request, socket.request.res, next);
+});
+
+app.get('/login', function (req, res) {
+    //TODO login page
+    req.session.authenticated = true;
+    res.redirect('/');
+});
+
+app.post('/login', function (req, res) {
+    //TODO validate data, set session
+});
 
 app.put('/sbricks/:uuid', function (req, res) {
+    if (req.session.authenticated === undefined) {
+        return res.sendStatus(401);
+    }
+
     if (!ajv.validate(schema, req.body)) {
         res.status(400).send(ajv.errors);
     } else {
@@ -30,6 +59,10 @@ app.put('/sbricks/:uuid', function (req, res) {
 });
 
 app.get('/sbricks/:uuid/video', function (req, res) {
+    if (req.session.authenticated === undefined) {
+        return res.sendStatus(401);
+    }
+
     storage.getItem(req.params.uuid)
         .then((value) => {
             if (value) {
@@ -37,7 +70,7 @@ app.get('/sbricks/:uuid/video', function (req, res) {
                     request
                         .get(value.streamUrl)
                         .on('error', function (err) {
-                            console.log(err);
+                            winston.error(err);
                         })
                         .pipe(res);
                 } else {
@@ -48,17 +81,34 @@ app.get('/sbricks/:uuid/video', function (req, res) {
             }
         })
         .catch((err) => {
-            console.log(err);
+            winston.error(err);
             res.send(err);
         });
 });
 
 io.on('connection', function (socket) {
-    socket.sbricks = {};
+    if (socket.request.session.authenticated === undefined) {
+        return socket.disconnect();
+    }
+
+    winston.add(socketLogger, {socket: socket});
+
+    let sbricks = [];
+
+    const findSBrickByUUID = function (uuid) {
+        return new Promise((resolve, reject) => {
+            sbricks.forEach((sbrick) => {
+                if (sbrick.uuid === uuid) {
+                    return resolve(sbrick);
+                }
+            });
+            reject('not found');
+        });
+    };
 
     socket.on('SBrick.scan', () => {
-        Object.keys(socket.sbricks).forEach((uuid) => {
-            socket.sbricks[uuid].disconnect();
+        sbricks.forEach((sbrick) => {
+            sbrick.disconnect();
         });
 
         SBrick.scanSBricks().then((sbricks) => {
@@ -88,33 +138,40 @@ io.on('connection', function (socket) {
             io.emit('SBrick.error', uuid, err);
             sbrick.disconnect();
         });
-        socket.sbricks[uuid] = sbrick;
+        sbricks.push(sbrick);
     });
 
     socket.on('SBrick.controlChannel', (uuid, channel, pwm) => {
-        if (socket.sbricks.hasOwnProperty(uuid)) {
-            socket.sbricks[uuid].channels[channel].pwm = pwm;
-        }
+        findSBrickByUUID(uuid)
+            .then((sbrick) => {
+                sbrick.channels[channel].pwm = pwm;
+            })
+            .catch(winston.error);
     });
 
     socket.on('SBrick.disconnect', (uuid) => {
-        if (socket.sbricks.hasOwnProperty(uuid)) {
-            socket.sbricks[uuid].disconnect();
-        }
+        findSBrickByUUID(uuid)
+            .then((sbrick) => {
+                sbrick.disconnect();
+            })
+            .catch(winston.error);
     });
 
     socket.on('SBrick.command', (uuid, command, args) => {
-        console.log(uuid, command, args);
-        if (socket.sbricks.hasOwnProperty(uuid)) {
-            if (typeof socket.sbricks[uuid][command] === 'function') {
-                socket.sbricks[uuid][command].apply(socket.sbricks[uuid], args).then(console.log).catch(console.log);
-            }
-        }
+        winston.info(uuid, command, args);
+        findSBrickByUUID(uuid)
+            .then((sbrick) => {
+                if (typeof sbrick[command] === 'function') {
+                    sbrick[command].apply(sbrick, args).then(winston.info).catch(winston.warn);
+                }
+            })
+            .catch(winston.error);
     });
 
     socket.on('disconnect', () => {
-        Object.keys(socket.sbricks).forEach((uuid) => {
-            socket.sbricks[uuid].disconnect();
+        winston.remove(socketLogger);
+        sbricks.forEach((sbrick) => {
+            sbrick.disconnect();
         });
     });
 });

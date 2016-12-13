@@ -6,7 +6,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-text-replace');
 
     var jsFilesThirdParty = [
-        "node_modules/socket.io/node_modules/socket.io-client/socket.io.js",
+        "node_modules/socket.io-client/dist/socket.io.js",
         "node_modules/jquery/dist/jquery.js",
         "node_modules/lodash/lodash.js",
         "node_modules/backbone/backbone.js",
