@@ -97,9 +97,9 @@ io.on('connection', function (socket) {
 
     const findSBrickByUUID = function (uuid) {
         return new Promise((resolve, reject) => {
-            sbricks.forEach((sbrick) => {
+            sbricks.forEach((sbrick, idx) => {
                 if (sbrick.uuid === uuid) {
-                    return resolve(sbrick);
+                    return resolve(sbrick, idx);
                 }
             });
             reject('not found');
@@ -131,6 +131,11 @@ io.on('connection', function (socket) {
             });
             sbrick.on('SBrick.disconnected', () => {
                 io.emit('SBrick.disconnected', uuid);
+                findSBrickByUUID(uuid)
+                    .then((sbrick, idx) => {
+                        sbricks.splice(idx, 1);
+                    })
+                    .catch(winston.error);
             });
 
             return sbrick.start(password);
@@ -173,6 +178,7 @@ io.on('connection', function (socket) {
         sbricks.forEach((sbrick) => {
             sbrick.disconnect();
         });
+        sbricks = [];
     });
 });
 
