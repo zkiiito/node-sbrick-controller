@@ -1,3 +1,5 @@
+![david-dm](https://david-dm.org/zkiiito/node-sbrick-controller.svg)
+
 # SBrick Controller
 Control your [Lego](https://lego.com) [SBrick](https://www.sbrick.com/) creations from the browser, using your keyboard!
 
