@@ -5,6 +5,7 @@
     <title>SBrick controller</title>
     <link rel="stylesheet" href="css/pure-min.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="https://sbrick.com/favicon.png">
 </head>
 <body>
 
@@ -20,10 +21,10 @@
         <button class="pure-button pure-button-primary sbrick-control-panel-connect">connect</button>
         <button class="pure-button pure-button-disabled button-error sbrick-control-panel-disconnect">disconnect</button>
 
-        <form class="pure-form pure-form-aligned">
+        <form class="pure-form pure-form-aligned" autocomplete="off">
             <div class="pure-control-group sbrick-control-panel-passwords">
                 <label>password:</label>
-                <input type="password" class="sbrick-control-panel-password pure-input-1-2" value="<%- password %>">
+                <input type="password" class="sbrick-control-panel-password pure-input-1-2" autocomplete="off" value="<%- password %>">
             </div>
             <div class="pure-control-group sbrick-control-panel-stream-urls">
                 <label>stream url:</label>

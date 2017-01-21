@@ -10,6 +10,7 @@ const async = require('async');
 const Ajv = require('ajv');
 const request = require('request');
 const winston = require('winston');
+const fs = require('fs');
 const socketLogger = require('./SocketLogger');
 const schema = require('./SBrickSchema');
 
@@ -22,33 +23,53 @@ const sessionMiddleware = session({
     resave: false
 });
 
+const authenticateMiddleware = function (req, res, next) {
+    if (!req.session.authenticated) {
+        return res.redirect('/login');
+    }
+    next();
+};
+
 storage.initSync({
     dir: __dirname + '/data'
 });
 
 app.use(bodyParser.json());
-app.use(express.static(__dirname + '/public'));
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+app.use('/css', express.static(__dirname + '/public/css'));
+app.use('/js-min', express.static(__dirname + '/public/js-min'));
 app.use(sessionMiddleware);
 
 io.use(function(socket, next) {
     sessionMiddleware(socket.request, socket.request.res, next);
 });
 
+app.get('/', authenticateMiddleware, function (req, res) {
+    fs.createReadStream(__dirname + '/public/index.html').pipe(res);
+});
+
 app.get('/login', function (req, res) {
-    //TODO login page
-    req.session.authenticated = true;
-    res.redirect('/');
+    fs.createReadStream(__dirname + '/public/login.html').pipe(res);
 });
 
 app.post('/login', function (req, res) {
-    //TODO validate data, set session
+    const passwd = process.env.passwd || 'adminPass';
+
+    if (req.body.username === 'admin' && req.body.password === passwd) {
+        req.session.authenticated = true;
+        return res.redirect('/');
+    }
+    res.redirect('/login');
 });
 
-app.put('/sbricks/:uuid', function (req, res) {
-    if (req.session.authenticated === undefined) {
-        return res.sendStatus(401);
-    }
+app.get('/logout', authenticateMiddleware, function (req, res) {
+    req.session.authenticated = false;
+    res.redirect('/login');
+});
 
+app.put('/sbricks/:uuid', authenticateMiddleware, function (req, res) {
     if (!ajv.validate(schema, req.body)) {
         res.status(400).send(ajv.errors);
     } else {
@@ -58,11 +79,7 @@ app.put('/sbricks/:uuid', function (req, res) {
     }
 });
 
-app.get('/sbricks/:uuid/video', function (req, res) {
-    if (req.session.authenticated === undefined) {
-        return res.sendStatus(401);
-    }
-
+app.get('/sbricks/:uuid/video', authenticateMiddleware, function (req, res) {
     storage.getItem(req.params.uuid)
         .then((value) => {
             if (value) {
@@ -119,6 +136,9 @@ io.on('connection', function (socket) {
             }, (err, results) => {
                 io.emit('SBrick.scanResponse', results);
             });
+        }).catch((err) => {
+            io.emit('SBrick.error', err);
+            io.emit('SBrick.scanResponse', []);
         });
     });
 
