@@ -4,7 +4,7 @@
 Control your [Lego](https://lego.com) [SBrick](https://www.sbrick.com/) creations from the browser, using your keyboard!
 
 ## Requirements
-A device with [node.js](https://nodejs.org/)  and a Bluetooth 4.x adapter, which is supported by [noble](https://github.com/sandeepmistry/noble#prerequisites).
+An [SBrick](https://sbrickstore.com/), a device with [node.js](https://nodejs.org/)  and a Bluetooth 4.x adapter, which is supported by [noble](https://github.com/sandeepmistry/noble#prerequisites).
 
 ## Installation
 ```
@@ -15,6 +15,8 @@ npm start
 ```
 then, open your browser at http://localhost:8000/
 
+default login: admin / adminPass
+
 ## Project status
 Working from the web UI:
 * scan for SBricks
@@ -23,5 +25,6 @@ Working from the web UI:
 * temperature & voltage real time chart
 * display video stream
 
-Still under development:
-* overall security: to put it on an raspberry PI, and control your creation from anywhere, it needs some :)
+Under development:
+* UI for password management
+* log viewer (logs are in the console for now)

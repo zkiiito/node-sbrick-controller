@@ -8,6 +8,8 @@ var Socket = {
         this.socket.on('SBrick.disconnected', this.disconnected);
         this.socket.on('SBrick.error', this.error);
         this.socket.on('SBrick.voltAndTemp', this.voltAndTemp);
+        this.socket.on('SBrick.voltage', this.voltage);
+        this.socket.on('SBrick.temperature', this.temperature);
         this.socket.on('connect', this.scan.bind(this));
         this.socket.on('disconnect', this.disconnectedFromServer);
         this.socket.on('log', this.log);
@@ -46,7 +48,16 @@ var Socket = {
     },
 
     voltAndTemp: function (uuid, voltage, temperature) {
-        app.voltAndTemp(uuid, voltage, temperature);
+        app.voltage(uuid, voltage);
+        app.temperature(uuid, temperature);
+    },
+
+    voltage: function (uuid, voltage) {
+        app.voltage(uuid, voltage);
+    },
+
+    temperature: function (uuid, temperature) {
+        app.temperature(uuid, temperature);
     },
 
     disconnectedFromServer: function () {

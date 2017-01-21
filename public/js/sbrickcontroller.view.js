@@ -93,10 +93,12 @@ var SBrickControllerView = Backbone.View.extend({
         this.model.get(uuid).setConnected(false);
     },
 
-    voltAndTemp: function (uuid, voltage, temperature) {
-        var time = new Date().getTime();
-        this.model.get(uuid).addVoltage(time, voltage);
-        this.model.get(uuid).addTemperature(time, temperature);
+    voltage: function (uuid, voltage) {
+        this.model.get(uuid).addVoltage(Date.now(), voltage);
+    },
+
+    temperature: function (uuid, temperature) {
+        this.model.get(uuid).addTemperature(Date.now(), temperature);
     },
 
     disconnectedFromServer: function () {

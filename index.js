@@ -146,8 +146,11 @@ io.on('connection', function (socket) {
         const sbrick = new SBrick(uuid);
         sbrick.connect().then(() => {
             io.emit('SBrick.connected', uuid);
-            sbrick.on('SBrick.voltAndTemp', (voltage, temperature) => {
-                io.emit('SBrick.voltAndTemp', uuid, voltage, temperature);
+            sbrick.on('SBrick.voltage', (voltage) => {
+                io.emit('SBrick.voltage', uuid, voltage);
+            });
+            sbrick.on('SBrick.temperature', (temperature) => {
+                io.emit('SBrick.temperature', uuid, temperature);
             });
             sbrick.on('SBrick.disconnected', () => {
                 io.emit('SBrick.disconnected', uuid);
