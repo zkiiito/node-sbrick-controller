@@ -3,6 +3,8 @@
 # SBrick Controller
 Control your [Lego](https://lego.com) [SBrick](https://www.sbrick.com/) creations from the browser, using your keyboard!
 
+I've written an article about this thing, [read it here](https://community.risingstack.com/node-js-iot-project-home-explorer-rover-with-lego-sbrick-raspberry-pi/)!
+
 ## Requirements
 An [SBrick](https://sbrickstore.com/), a device with [node.js](https://nodejs.org/)  and a Bluetooth 4.x adapter, which is supported by [noble](https://github.com/sandeepmistry/noble#prerequisites).
 
