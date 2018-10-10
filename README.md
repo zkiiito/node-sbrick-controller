@@ -1,6 +1,9 @@
 ![david-dm](https://david-dm.org/zkiiito/node-sbrick-controller.svg)
 
 # SBrick Controller
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/zkiiito/node-sbrick-controller.svg)](https://greenkeeper.io/)
+
 Control your [Lego](https://lego.com) [SBrick](https://www.sbrick.com/) creations from the browser, using your keyboard!
 
 I've written an article about this thing, [read it here](https://community.risingstack.com/node-js-iot-project-home-explorer-rover-with-lego-sbrick-raspberry-pi/)!
