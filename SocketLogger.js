@@ -1,20 +1,19 @@
-const winston = require('winston');
-const util = require('util');
+const Transport = require('winston-transport');
 
-const SocketLogger = function (options) {
-    this.name = 'SocketLogger';
-    this.level = options.level || 'info';
-    this.socket = options.socket;
-};
+module.exports = class CustomTransport extends Transport {
+    constructor(opts) {
+        super(opts);
+        this.socket = null;
+    }
 
-util.inherits(SocketLogger, winston.Transport);
+    log(info, callback) {
+        if (this.socket) {
+            this.socket.emit('log', info.level, info.message);
+        }
+        callback();
+    }
 
-SocketLogger.prototype.log = function (level, message, metadata, callback) {
-    this.socket.emit('log', level, message);
-
-    if (callback) {
-        callback(null, true);
+    setSocket(socket) {
+        this.socket = socket;
     }
 };
-
-module.exports = SocketLogger;

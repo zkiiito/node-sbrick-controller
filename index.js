@@ -9,11 +9,12 @@ const storage = require('node-persist');
 const async = require('async');
 const Ajv = require('ajv');
 const request = require('request');
-const winston = require('winston');
 const fs = require('fs');
-const socketLogger = require('./SocketLogger');
-const schema = require('./SBrickSchema');
 
+const { winston, socketLogger } = require('./Logger');
+SBrick.winston = winston;
+
+const schema = require('./SBrickSchema');
 const ajv = new Ajv();
 
 const sessionMiddleware = session({
@@ -108,7 +109,7 @@ io.on('connection', function (socket) {
         return socket.disconnect();
     }
 
-    winston.add(socketLogger, {socket: socket});
+    socketLogger.setSocket(socket);
 
     let sbricks = [];
 
@@ -197,7 +198,7 @@ io.on('connection', function (socket) {
     });
 
     socket.on('disconnect', () => {
-        winston.remove(socketLogger);
+        socketLogger.setSocket(null);
         sbricks.forEach((sbrick) => {
             sbrick.disconnect();
         });
@@ -206,4 +207,4 @@ io.on('connection', function (socket) {
 });
 
 server.listen(8000);
-console.log('Open your browser at http://localhost:8000');
+winston.info('Open your browser at http://localhost:8000');
